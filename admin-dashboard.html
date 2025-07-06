@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Dashboard</h2>
+    <p>Welcome, Admin!</p>
+    <button onclick="logoutUser(); window.location.href='login.html';">Logout</button>
+
+    <h3>Client Profit Management</h3>
+    <table id="clientTable" border="1" cellpadding="10">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Profit</th>
+          <th>Currency</th>
+          <th>Update Amount</th>
+          <th>Set Currency</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const admin = localStorage.getItem('loggedIn');
+      if (admin !== 'admin') {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('trust_users')) || [];
+      const profits = JSON.parse(localStorage.getItem('trust_profits')) || {};
+      const tbody = document.querySelector('#clientTable tbody');
+
+      users.forEach(user => {
+        const profit = profits[user.email] || { amount: 0, currency: 'USD' };
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${user.email}</td>
+          <td>${profit.amount.toFixed(2)}</td>
+          <td>${profit.currency}</td>
+          <td><input type="number" id="amount-${user.email}" placeholder="+/- amount" /></td>
+          <td>
+            <select id="currency-${user.email}">
+              <option value="USD">USD</option>
+              <option value="ZAR">ZAR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </td>
+          <td><button onclick="modifyProfit('${user.email}')">Update</button></td>`;
+        tbody.appendChild(row);
+      });
+    });
+
+    function modifyProfit(email) {
+      const amount = parseFloat(document.getElementById(`amount-${email}`).value);
+      const currency = document.getElementById(`currency-${email}`).value;
+      const profits = JSON.parse(localStorage.getItem('trust_profits')) || {};
+      if (!profits[email]) profits[email] = { amount: 0, currency };
+      profits[email].amount += amount;
+      profits[email].currency = currency;
+      localStorage.setItem('trust_profits', JSON.stringify(profits));
+      alert(`Updated ${email}'s profit.`);
+      window.location.reload();
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('loggedIn');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Dashboard</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="container">
+  <h2>Welcome to Your Portfolio</h2>
+  <p><strong>Logged in as:</strong> <span id="clientEmail"></span></p>
+  <div class="profit-box">
+    <h3>Your Profit</h3>
+    <p><span id="profitAmount">0</span> <span id="profitCurrency">USD</span></p>
+  </div>
+  <button onclick="logoutUser(); window.location.href='login.html';">Logout</button></div>
+<script src="script.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = localStorage.getItem('loggedIn');
+    if (!user || user === 'admin') {
+      window.location.href = 'login.html';
+      return;
+    }
+    document.getElementById('clientEmail').innerText = user;
+    const profits = JSON.parse(localStorage.getItem('trust_profits')) || {};
+    const profit = profits[user] || { amount: 0, currency: 'USD' };
+    document.getElementById('profitAmount').innerText = profit.amount.toFixed(2);
+    document.getElementById('profitCurrency').innerText = profit.currency;
+  });
+</script></body></html>
